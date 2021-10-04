@@ -1,70 +1,56 @@
-# Getting Started with Create React App
+# User Maker App Test
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-## Available Scripts
+## Inconvienient Dependencies
 
-In the project directory, you can run:
+A function in testing may have inconvenient dependencies on other objects. To isolate the behavior of the function, it's often desirable to replace the other objects with mocks that simulate the behavior of the real objects. Replacing objects is especially useful if the actual objects are impractical to incorporate into the unit test.
 
-### `npm start`
+Another use of mocks is as "spies" because they let us spy on the behavior of a function that is called by some other code. Mock functions can keep track of calls to the function and the parameters passed in those calls. We can even define an implementation for the mock, but that's optional. Simpler mocks that implement only enough behavior to execute test code are sometimes called "stubs."
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+### Lambda School 3.1 React Testing Notes
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+Module Study Guide: [Testing React](https://learn.lambdaschool.com/tracks/web-development/units/webapplications-ii/sprints/advanced-web-applications/)
 
-### `npm test`
+Let's implement a helper function with an uncomfortable dependency that makes the helper impure (reliant on something outside of its scope) and, therefore, harder to test:
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+1. Install the uuid npm library using ```npm i uuid``` and make use of it in the following simple component:
+    ```javascript
+    import uuid from "uuid";
 
-### `npm run build`
+    export const makeUser = (firstName, lastName) => {
+        return {
+        id: uuid(),
+        fullName: `${firstName} ${lastName}`
+        };
+    };
+    ```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+2. Testing expected output against actual output would be complex because ```uuid()``` generates a new, random id each time. We can give it a try, though. Note the use of ```.toEqual()``` to make our assertion. It compares the nested properties of objects, which we need to check here:
+    ```javascript
+    import { makeUser } from "../utils/makeUser";
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+    test("generates a user with an id and a full name", () => {
+        // Arrange
+        const expected = { id: "abcde", fullName: "Peter Parker" }; // fishy...
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+        // Act
+        const actual = makeUser("Peter", "Parker");
 
-### `npm run eject`
+        // Assert
+        expect(actual).toEqual(expected);
+    });
+    ```
+![Random ID complexity error](/src/assets/error.png)
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+>By the way, this kind of test is called a unit test - a test for a single unit of code, like an isolated function like makeUser. You'll learn more about unit testing in the backend unit, but we can see what is happening here with the AAA framework.
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+3. To get around this problem, we can stub out (create) a fake version of uuid that will replace the real one during the execution of the test. Outside of the test block, at the top level of the test file, place the following code:
+    ```javascript
+    jest.mock("uuid", () => () => "abcde");
+    ```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+Let's break it down. As the first argument to ```jest.mock()```, we pass the path to the module we want to replace. As the second argument, we pass a callback that returns whatever it is we want the faked thing to be. We wish for ```uuid``` to become a silly stub function that always returns the same string: ```uuid() // "abcde"```. Our tests should be passing now!
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+#### Challenge
+There is a way to centralize mocks that are often used (think  ```uuid```, or ```axios```) in external files to be used in test suites without even bothering with imports. Go to the Jest docs and see if you can find out how!
