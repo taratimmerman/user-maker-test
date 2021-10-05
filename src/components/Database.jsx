@@ -5,9 +5,7 @@ import AllUsers from './AllUsers';
 const Database = () => (
   <section>
     <h2>Database Users</h2>
-    <div>
-      <AllUsers />
-    </div>
+    <AllUsers />
   </section>
 );
 
