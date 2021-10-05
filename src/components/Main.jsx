@@ -1,10 +1,10 @@
 import React from 'react';
 
+import Form from './Form';
+
 const Main = () => (
   <main>
-    <section>
-      <h1>Make a User</h1>
-    </section>
+    <Form />
   </main>
 );
 
