@@ -1,8 +1,13 @@
 import React from 'react';
 
+import User from './User';
+
 const Database = () => (
   <section>
-    <h1>Database Users</h1>
+    <h2>Database Users</h2>
+    <div>
+      <User />
+    </div>
   </section>
 );
 
