@@ -1,5 +1,10 @@
 import React from 'react';
 
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+
+import { addUserAction } from '../actions/userActions';
+
 const Form = () => (
   <section>
     <h2>Make a User</h2>
@@ -28,4 +33,21 @@ const Form = () => (
   </section>
 );
 
-export default Form;
+function mapStateToProps(state) {
+  const [users] = state.userReducer.users;
+  return (
+    users
+  );
+}
+
+function mapDispatchToProps() {
+  bindActionCreators = {
+    addUserAction,
+  };
+
+  return (
+    bindActionCreators
+  );
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Form);
