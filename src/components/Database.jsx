@@ -1,12 +1,12 @@
 import React from 'react';
 
-import User from './User';
+import AllUsers from './AllUsers';
 
 const Database = () => (
   <section>
     <h2>Database Users</h2>
     <div>
-      <User />
+      <AllUsers />
     </div>
   </section>
 );
