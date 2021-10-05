@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import { useForm } from 'react-hook-form';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
+import { v4 as uuidv4 } from 'uuid';
 
 import { addUserAction } from '../actions/userActions';
 
@@ -20,7 +21,12 @@ function Form({ addUser }) {
     const firstName = user.firstName.trim();
     const lastName = user.lastName.trim();
 
-    addUser(firstName, lastName);
+    const newUser = {
+      id: uuidv4(),
+      fullName: `${firstName} ${lastName}`,
+    };
+
+    addUser(newUser);
   };
 
   const handleError = (error) => console.log(error);
